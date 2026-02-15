@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTasks } from '../hooks/useTasks';
+import { formatTo12Hour } from '../utils/formateTime'
 
 const AddTaskSidebar = ({ isMobile }) => {
     const { state, dispatch } = useTasks();
@@ -358,7 +359,9 @@ const AddTaskSidebar = ({ isMobile }) => {
                                     </div>
                                     <div className="min-w-0 flex-1">
                                         <p className="text-xs font-bold text-[#E0E0E0] truncate">{task.title}</p>
-                                        <p className="text-[10px] text-[#94A3B8]">{task.dueDate} • {task.dueTime || task.time || 'Anytime'}</p>
+                                        <p className="text-[10px] text-[#94A3B8]">
+                                            {task.dueDate} • {formatTo12Hour(task.dueTime || task.time) || 'Anytime'}
+                                        </p>
                                     </div>
                                 </div>
                             ))

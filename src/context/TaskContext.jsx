@@ -5,11 +5,11 @@ import { useNotifications } from '../hooks/useNotifications';
 
 const initialState = {
   tasks: [],
-  filter: 'all',            // 'all', 'active', 'completed', 'today'
-  categoryFilter: null,      // null | 'work' | 'personal'
-  sortBy: 'date',            // 'date', 'priority'
-  sortOrder: 'asc',          // 'asc', 'desc'
-  toasts: [],                // [{ id, message, type }]
+  filter: 'all',
+  categoryFilter: null,
+  sortBy: 'date',
+  sortOrder: 'asc',
+  toasts: [],
   searchTerm: '',
   userName: '',
 };
@@ -66,6 +66,9 @@ function taskReducer(state, action) {
       return { ...state, sortBy: action.payload.sortBy, sortOrder: action.payload.sortOrder };
     case 'SET_SEARCH':
       return { ...state, searchTerm: action.payload };
+    case 'LOGOUT':
+      // Clear all data and return to initial state
+      return { ...initialState };
     default:
       return state;
   }
@@ -83,11 +86,9 @@ export const TaskProvider = ({ children }) => {
     }
   }, [storedUserName]);
 
-  // Persist userName changes
+  // Persist userName changes (including empty string after logout)
   useEffect(() => {
-    if (state.userName) {
-      setStoredUserName(state.userName);
-    }
+    setStoredUserName(state.userName || '');
   }, [state.userName, setStoredUserName]);
 
   // Load tasks from localStorage
@@ -97,7 +98,7 @@ export const TaskProvider = ({ children }) => {
     }
   }, [storedTasks]);
 
-  // Storage Monitor & Pruning Logic
+  // Storage Monitor & Pruning Logic + persist tasks
   useEffect(() => {
     const dataString = JSON.stringify(state.tasks);
     const sizeInBytes = new Blob([dataString]).size;
@@ -107,9 +108,9 @@ export const TaskProvider = ({ children }) => {
       const sortedByAge = [...state.tasks].sort((a, b) => a.id - b.id);
       const toKeep = sortedByAge.slice(Math.floor(sortedByAge.length * 0.2));
       dispatch({ type: 'SET_TASKS', payload: toKeep });
+    } else {
+      setStoredTasks(state.tasks);
     }
-
-    setStoredTasks(state.tasks);
   }, [state.tasks, setStoredTasks]);
 
   // Notifications for due tasks

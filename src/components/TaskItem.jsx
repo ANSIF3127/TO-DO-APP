@@ -5,7 +5,8 @@ const TaskItem = ({ task }) => {
     const { dispatch } = useTasks();
     const [showActions, setShowActions] = useState(false);
 
-    const handleToggle = () => {
+    const handleToggle = (e) => {
+        if (e.target.closest('button')) return;
         dispatch({ type: 'TOGGLE_COMPLETE', payload: task.id });
     };
 
@@ -59,35 +60,26 @@ const TaskItem = ({ task }) => {
                 onClick={handleToggle}
                 className="group bg-[#1E2A36] p-4 md:p-5 rounded-xl border border-[#3A4A5A] opacity-70 grayscale-[0.5] transition-all cursor-pointer hover:opacity-80 overflow-hidden"
             >
-                <div className="flex gap-3 md:gap-4">
-                    <div className="mt-1 shrink-0">
-                        <div className="w-5 h-5 bg-primary rounded-md flex items-center justify-center">
-                            <span className="material-icons text-white text-[14px]">check</span>
-                        </div>
+                <div className="flex flex-col gap-3">
+                    <div className="flex items-start justify-between">
+                        <h4 className="font-bold text-[#94A3B8] line-through truncate flex-1">{task.title}</h4>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#3A4A5A] text-[#94A3B8] font-bold uppercase tracking-wider shrink-0 ml-2">Done</span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2 mb-1">
-                            <h4 className="font-bold text-[#94A3B8] line-through truncate">{task.title}</h4>
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#3A4A5A] text-[#94A3B8] font-bold uppercase tracking-wider shrink-0">Done</span>
+                    {task.description && (
+                        <p className="text-sm text-[#94A3B8] line-clamp-2 italic">{task.description}</p>
+                    )}
+                    <div className="flex items-center justify-between mt-2">
+                        <div className="flex items-center gap-1 text-xs text-[#94A3B8]">
+                            <span className="material-icons text-sm">done_all</span>
+                            Completed
                         </div>
-                        {task.description && (
-                            <p className="text-sm text-[#94A3B8] mb-3 line-clamp-2 italic">{task.description}</p>
-                        )}
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3 text-xs text-[#94A3B8] font-medium">
-                                <div className="flex items-center gap-1">
-                                    <span className="material-icons text-sm">done_all</span>
-                                    Completed
-                                </div>
-                            </div>
-                            <button
-                                onClick={handleDelete}
-                                className="text-[#94A3B8] hover:text-red-500 transition-colors p-1"
-                                title="Delete task"
-                            >
-                                <span className="material-icons text-sm">delete</span>
-                            </button>
-                        </div>
+                        <button
+                            onClick={handleDelete}
+                            className="text-[#94A3B8] hover:text-red-500 transition-colors p-1"
+                            title="Delete task"
+                        >
+                            <span className="material-icons text-sm">delete</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -101,58 +93,67 @@ const TaskItem = ({ task }) => {
             onMouseLeave={() => setShowActions(false)}
             className={`group bg-[#2C3E50] p-4 md:p-5 rounded-xl border-l-4 ${p.border} border-y border-r border-[#3A4A5A] shadow-sm hover:shadow-lg transition-all cursor-pointer overflow-hidden relative`}
         >
-            <div className="flex gap-3 md:gap-4">
-                <div className="mt-1 shrink-0">
-                    <div className="w-5 h-5 border-2 border-[#94A3B8] rounded-md flex items-center justify-center group-hover:border-primary transition-colors"></div>
+            {/* Pin Icon - top left */}
+            <button
+                onClick={handlePin}
+                className={`absolute top-3 left-3 p-1 rounded-lg transition-colors z-10 ${
+                    task.pinned ? 'text-amber-500 bg-amber-500/10' : 'text-[#94A3B8] hover:text-amber-500 hover:bg-amber-500/10'
+                }`}
+                title={task.pinned ? 'Unpin task' : 'Pin task'}
+            >
+                <span className="material-icons text-sm">push_pin</span>
+            </button>
+
+            <div className="flex flex-col gap-2 pl-8"> {/* pl-8 prevents overlap with pin */}
+                {/* Category and Priority Badges */}
+                <div className="flex items-center gap-1.5">
+                    {cat && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full ${cat.bg} ${cat.text} font-bold uppercase tracking-wider`}>
+                            {task.category}
+                        </span>
+                    )}
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${p.bg} ${p.text} font-bold uppercase tracking-wider`}>{p.label}</span>
                 </div>
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-start sm:items-center justify-between gap-2 mb-1 flex-col sm:flex-row">
-                        <h4 className="font-bold text-[#E0E0E0] truncate">{task.title}</h4>
-                        <div className="flex items-center gap-1.5 shrink-0">
-                            {cat && (
-                                <span className={`text-[10px] px-2 py-0.5 rounded-full ${cat.bg} ${cat.text} font-bold uppercase tracking-wider`}>
-                                    {task.category}
-                                </span>
-                            )}
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${p.bg} ${p.text} font-bold uppercase tracking-wider`}>{p.label}</span>
-                        </div>
+
+                {/* Title */}
+                <h4 className="font-bold text-[#E0E0E0] break-words">{task.title}</h4>
+
+                {/* Description */}
+                {task.description && (
+                    <p className="text-sm text-[#94A3B8] line-clamp-2">{task.description}</p>
+                )}
+
+                {/* Date/Time */}
+                <div className="flex items-center gap-2 text-[11px] text-[#94A3B8] font-medium mt-1">
+                    <div className="flex items-center gap-0.5">
+                        <span className="material-icons text-xs">schedule</span>
+                        <span>{task.time || task.dueTime || 'Anytime'}</span>
                     </div>
-                    {task.description && (
-                        <p className="text-sm text-[#94A3B8] mb-3 line-clamp-2">{task.description}</p>
-                    )}
-                    <div className="flex items-center justify-between flex-wrap gap-2">
-                        <div className="flex items-center gap-3 text-xs text-[#94A3B8] font-medium">
-                            <div className="flex items-center gap-1">
-                                <span className="material-icons text-sm">schedule</span>
-                                {task.time || task.dueTime || 'Anytime'}
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <span className="material-icons text-sm">calendar_month</span>
-                                {task.dueDate || 'No date'}
-                            </div>
-                        </div>
-                        <div className={`flex items-center gap-1 transition-opacity ${showActions ? 'opacity-100' : 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'}`}>
-                            <button
-                                onClick={handlePin}
-                                className={`p-1 rounded-lg transition-colors ${task.pinned ? 'text-amber-500 bg-amber-500/10' : 'text-[#94A3B8] hover:text-amber-500 hover:bg-amber-500/10'}`}
-                                title={task.pinned ? 'Unpin task' : 'Pin task'}
-                            >
-                                <span className="material-icons text-sm">push_pin</span>
-                            </button>
-                            <button
-                                onClick={handleDelete}
-                                className="p-1 rounded-lg text-[#94A3B8] hover:text-red-500 hover:bg-red-500/10 transition-colors"
-                                title="Delete task"
-                            >
-                                <span className="material-icons text-sm">delete</span>
-                            </button>
-                        </div>
+                    <div className="flex items-center gap-0.5">
+                        <span className="material-icons text-xs">calendar_month</span>
+                        <span>{task.dueDate || 'No date'}</span>
                     </div>
-                    {task.pinned && (
-                        <div className="absolute top-2 right-2">
-                            <span className="material-icons text-amber-500 text-xs">push_pin</span>
-                        </div>
-                    )}
+                </div>
+
+                {/* Action Buttons - icons only */}
+                <div className="flex items-center justify-between mt-2">
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            dispatch({ type: 'TOGGLE_COMPLETE', payload: task.id });
+                        }}
+                        className="p-1.5 rounded-lg text-[#94A3B8] hover:text-primary hover:bg-primary/10 transition-colors"
+                        title="Mark as complete"
+                    >
+                        <span className="material-icons text-lg">check_circle_outline</span>
+                    </button>
+                    <button
+                        onClick={handleDelete}
+                        className="p-1.5 rounded-lg text-[#94A3B8] hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                        title="Delete task"
+                    >
+                        <span className="material-icons text-lg">delete_outline</span>
+                    </button>
                 </div>
             </div>
         </div>
