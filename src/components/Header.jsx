@@ -7,7 +7,6 @@ const Header = () => {
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const notifRef = useRef(null);
 
-    // Close dropdown on outside click
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (notifRef.current && !notifRef.current.contains(e.target)) {
@@ -18,7 +17,6 @@ const Header = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Build notification items from tasks
     const notifications = useMemo(() => {
         const now = new Date();
         const todayStr = now.toISOString().split('T')[0];
@@ -49,68 +47,63 @@ const Header = () => {
         : 'U';
 
     return (
-        <header className="h-14 md:h-16 border-b border-slate-200 bg-white/80 backdrop-blur-md flex items-center justify-between px-4 md:px-8 z-10">
-            {/* Search — full on desktop, toggle on mobile */}
+        <header className="h-14 md:h-16 border-b border-[#3A4A5A] bg-[#2C3E50]/80 backdrop-blur-md flex items-center justify-between px-4 md:px-8 z-10">
             <div className={`flex items-center flex-1 max-w-md ${mobileSearchOpen ? '' : 'hidden md:flex'}`}>
                 <div className="relative w-full">
-                    <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+                    <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]">search</span>
                     <input
-                        className="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/50 transition-all text-slate-900 placeholder-slate-400"
+                        className="w-full pl-10 pr-4 py-2 bg-[#1E2A36] border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/50 transition-all text-[#E0E0E0] placeholder-[#94A3B8]"
                         placeholder="Search tasks..."
                         type="text"
                         value={state.searchTerm}
                         onChange={(e) => dispatch({ type: 'SET_SEARCH', payload: e.target.value })}
                     />
                 </div>
-                {/* Close search on mobile */}
-                <button className="md:hidden ml-2 p-1 text-slate-400" onClick={() => setMobileSearchOpen(false)}>
+                <button className="md:hidden ml-2 p-1 text-[#94A3B8]" onClick={() => setMobileSearchOpen(false)}>
                     <span className="material-icons text-xl">close</span>
                 </button>
             </div>
 
-            {/* Mobile search toggle */}
             {!mobileSearchOpen && (
-                <button className="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-full" onClick={() => setMobileSearchOpen(true)}>
+                <button className="md:hidden p-2 text-[#94A3B8] hover:bg-[#3A4A5A] rounded-full" onClick={() => setMobileSearchOpen(true)}>
                     <span className="material-icons">search</span>
                 </button>
             )}
 
             <div className={`flex items-center gap-2 md:gap-3 ${mobileSearchOpen ? 'hidden md:flex' : ''}`}>
-                {/* Notification Bell */}
                 <div className="relative" ref={notifRef}>
                     <button
                         onClick={() => setShowNotifications(!showNotifications)}
-                        className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors relative"
+                        className="p-2 text-[#94A3B8] hover:bg-[#3A4A5A] rounded-full transition-colors relative"
                     >
                         <span className="material-icons">notifications</span>
                         {notifications.length > 0 && (
-                            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+                            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#2C3E50] animate-pulse"></span>
                         )}
                     </button>
 
-                    {/* Notification Dropdown */}
                     {showNotifications && (
-                        <div className="absolute right-0 top-12 w-72 md:w-80 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-50"
+                        <div className="absolute right-0 top-12 w-72 md:w-80 bg-[#2C3E50] border border-[#3A4A5A] rounded-2xl shadow-xl overflow-hidden z-50"
                             style={{ animation: 'notifSlideDown 0.25s ease-out forwards' }}>
-                            <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-                                <h3 className="text-sm font-bold text-slate-800">Notifications</h3>
+                            <div className="px-4 py-3 border-b border-[#3A4A5A] flex items-center justify-between">
+                                <h3 className="text-sm font-bold text-[#E0E0E0]">Notifications</h3>
                                 <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">{notifications.length}</span>
                             </div>
                             <div className="max-h-72 overflow-y-auto custom-scrollbar">
                                 {notifications.length === 0 ? (
                                     <div className="p-6 text-center">
-                                        <span className="material-icons text-3xl text-slate-300 mb-2 block">notifications_off</span>
-                                        <p className="text-sm text-slate-400">No pending notifications</p>
+                                        <span className="material-icons text-3xl text-[#4A5568] mb-2 block">notifications_off</span>
+                                        <p className="text-sm text-[#94A3B8]">No pending notifications</p>
                                     </div>
                                 ) : (
                                     notifications.map((n) => (
-                                        <div key={n.id} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-b-0">
+                                        <div key={n.id} className="flex items-center gap-3 px-4 py-3 hover:bg-[#1E2A36] transition-colors border-b border-[#3A4A5A] last:border-b-0">
                                             <div className={`p-2 rounded-xl ${n.color}`}>
                                                 <span className="material-icons text-sm">{n.icon}</span>
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-xs font-bold text-slate-800 truncate">{n.title}</p>
-                                                <p className="text-[10px] text-slate-400 font-medium">{n.label}</p>
+                                                <p className="text-xs font-bold text-[#E0E0E0] truncate">{n.title}</p>
+                                                <p className="text-[10px] text-[#94A3B8] font-medium">{n.label}</p>
                                             </div>
                                         </div>
                                     ))
@@ -120,13 +113,12 @@ const Header = () => {
                     )}
                 </div>
 
-                {/* User Profile */}
                 <div className="flex items-center gap-2 md:gap-3">
                     <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
                         {initials}
                     </div>
                     <div className="text-right hidden sm:block">
-                        <p className="text-xs font-bold text-slate-800">{state.userName}</p>
+                        <p className="text-xs font-bold text-[#E0E0E0]">{state.userName}</p>
                     </div>
                     <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                 </div>

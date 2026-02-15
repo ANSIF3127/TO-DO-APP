@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTasks } from '../hooks/useTasks';
 
 const AddTaskSidebar = ({ isMobile }) => {
@@ -45,7 +45,6 @@ const AddTaskSidebar = ({ isMobile }) => {
             payload: { message: 'Task Created Successfully', type: 'success' }
         });
 
-        // Reset form
         setTitle('');
         setDescription('');
         setPriority('medium');
@@ -53,34 +52,33 @@ const AddTaskSidebar = ({ isMobile }) => {
         setDueDate('');
     };
 
-    // Sync category with sidebar filter
-    React.useEffect(() => {
+    useEffect(() => {
         if (state.categoryFilter) {
             setCategory(state.categoryFilter);
         }
     }, [state.categoryFilter]);
 
-    // For mobile, render just the form content without the aside wrapper
+    // Mobile version
     if (isMobile) {
         return (
             <div className="p-4">
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
-                        <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Task Name</label>
+                        <label className="block text-xs font-bold text-[#94A3B8] uppercase mb-2">Task Name</label>
                         <input
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            className="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary/50 text-slate-900 outline-none transition-all"
+                            className="w-full px-4 py-2.5 bg-[#1E2A36] border border-[#3A4A5A] rounded-xl text-sm focus:ring-2 focus:ring-primary/50 text-[#E0E0E0] placeholder-[#94A3B8] outline-none transition-all"
                             placeholder="e.g. Design homepage"
                         />
                     </div>
                     <div>
-                        <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Description</label>
+                        <label className="block text-xs font-bold text-[#94A3B8] uppercase mb-2">Description</label>
                         <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            className="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary/50 resize-none text-slate-900 outline-none transition-all"
+                            className="w-full px-4 py-2.5 bg-[#1E2A36] border border-[#3A4A5A] rounded-xl text-sm focus:ring-2 focus:ring-primary/50 text-[#E0E0E0] placeholder-[#94A3B8] resize-none outline-none transition-all"
                             placeholder="Write some details..."
                             rows="3"
                         ></textarea>
@@ -88,12 +86,16 @@ const AddTaskSidebar = ({ isMobile }) => {
 
                     {/* Category */}
                     <div>
-                        <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Category</label>
+                        <label className="block text-xs font-bold text-[#94A3B8] uppercase mb-2">Category</label>
                         <div className="flex gap-2">
                             <button
                                 type="button"
                                 onClick={() => setCategory('work')}
-                                className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${category === 'work' ? 'border-blue-500 bg-blue-500/10 text-blue-500' : 'border-slate-200 text-slate-400 hover:border-blue-500/50'}`}
+                                className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+                                    category === 'work'
+                                        ? 'border-blue-500 bg-blue-500/10 text-blue-500'
+                                        : 'border-[#3A4A5A] text-[#94A3B8] hover:border-blue-500/50'
+                                }`}
                             >
                                 <span className="w-2 h-2 rounded-full bg-blue-500"></span>
                                 Work
@@ -101,7 +103,11 @@ const AddTaskSidebar = ({ isMobile }) => {
                             <button
                                 type="button"
                                 onClick={() => setCategory('personal')}
-                                className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${category === 'personal' ? 'border-purple-500 bg-purple-500/10 text-purple-500' : 'border-slate-200 text-slate-400 hover:border-purple-500/50'}`}
+                                className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+                                    category === 'personal'
+                                        ? 'border-purple-500 bg-purple-500/10 text-purple-500'
+                                        : 'border-[#3A4A5A] text-[#94A3B8] hover:border-purple-500/50'
+                                }`}
                             >
                                 <span className="w-2 h-2 rounded-full bg-purple-500"></span>
                                 Personal
@@ -111,36 +117,52 @@ const AddTaskSidebar = ({ isMobile }) => {
 
                     {/* Priority */}
                     <div>
-                        <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Priority</label>
+                        <label className="block text-xs font-bold text-[#94A3B8] uppercase mb-2">Priority</label>
                         <div className="flex gap-2">
                             <button
                                 type="button"
                                 onClick={() => setPriority('high')}
-                                className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all ${priority === 'high' ? 'border-red-500 bg-red-500/10 text-red-500' : 'border-slate-200 text-slate-400 hover:border-red-500/50'}`}
+                                className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all ${
+                                    priority === 'high'
+                                        ? 'border-red-500 bg-red-500/10 text-red-500'
+                                        : 'border-[#3A4A5A] text-[#94A3B8] hover:border-red-500/50'
+                                }`}
                             >High</button>
                             <button
                                 type="button"
                                 onClick={() => setPriority('medium')}
-                                className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all ${priority === 'medium' ? 'border-green-500 bg-green-500/10 text-green-500' : 'border-slate-200 text-slate-400 hover:border-green-500/50'}`}
+                                className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all ${
+                                    priority === 'medium'
+                                        ? 'border-green-500 bg-green-500/10 text-green-500'
+                                        : 'border-[#3A4A5A] text-[#94A3B8] hover:border-green-500/50'
+                                }`}
                             >Med</button>
                             <button
                                 type="button"
                                 onClick={() => setPriority('low')}
-                                className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all ${priority === 'low' ? 'border-blue-500 bg-blue-500/10 text-blue-500' : 'border-slate-200 text-slate-400 hover:border-blue-500/50'}`}
+                                className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all ${
+                                    priority === 'low'
+                                        ? 'border-blue-500 bg-blue-500/10 text-blue-500'
+                                        : 'border-[#3A4A5A] text-[#94A3B8] hover:border-blue-500/50'
+                                }`}
                             >Low</button>
                         </div>
                     </div>
 
                     {/* Time */}
                     <div>
-                        <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Time Setting</label>
+                        <label className="block text-xs font-bold text-[#94A3B8] uppercase mb-2">Time Setting</label>
                         <div className="flex gap-2 mb-3">
                             {timePresets.map(preset => (
                                 <button
                                     key={preset.label}
                                     type="button"
                                     onClick={() => setDueTime(preset.value)}
-                                    className={`flex-1 flex flex-col items-center gap-1 px-2 py-2 text-xs border rounded-xl font-medium transition-all ${dueTime === preset.value ? 'bg-primary/10 text-primary border-primary/30' : 'bg-slate-50 text-slate-500 border-slate-200 hover:border-primary/30'}`}
+                                    className={`flex-1 flex flex-col items-center gap-1 px-2 py-2 text-xs border rounded-xl font-medium transition-all ${
+                                        dueTime === preset.value
+                                            ? 'bg-primary/10 text-primary border-primary/30'
+                                            : 'bg-[#1E2A36] text-[#94A3B8] border-[#3A4A5A] hover:border-primary/30'
+                                    }`}
                                 >
                                     <span className="material-icons text-sm">{preset.icon}</span>
                                     {preset.label}
@@ -148,21 +170,21 @@ const AddTaskSidebar = ({ isMobile }) => {
                             ))}
                         </div>
                         <div className="relative mb-3">
-                            <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">calendar_today</span>
+                            <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm">calendar_today</span>
                             <input
                                 type="date"
                                 value={dueDate}
                                 onChange={(e) => setDueDate(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/50 text-slate-900 outline-none transition-all"
+                                className="w-full pl-10 pr-4 py-2.5 bg-[#1E2A36] border border-[#3A4A5A] rounded-xl text-sm focus:ring-2 focus:ring-primary/50 text-[#E0E0E0] outline-none transition-all"
                             />
                         </div>
                         <div className="relative">
-                            <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">schedule</span>
+                            <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm">schedule</span>
                             <input
                                 type="time"
                                 value={dueTime}
                                 onChange={(e) => setDueTime(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/50 text-slate-900 outline-none transition-all"
+                                className="w-full pl-10 pr-4 py-2.5 bg-[#1E2A36] border border-[#3A4A5A] rounded-xl text-sm focus:ring-2 focus:ring-primary/50 text-[#E0E0E0] outline-none transition-all"
                             />
                         </div>
                     </div>
@@ -176,144 +198,175 @@ const AddTaskSidebar = ({ isMobile }) => {
         );
     }
 
+    // Desktop version – with overflow fix
     return (
-        <aside className="add-task-sidebar hidden lg:flex w-80 border-l border-slate-200 flex-col bg-white p-6 overflow-y-auto custom-scrollbar">
-            <h2 className="text-lg font-bold mb-6 text-slate-800">Create New Task</h2>
-            <form onSubmit={handleSubmit} className="space-y-5">
-                <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Task Name</label>
-                    <input
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary/50 text-slate-900 outline-none transition-all"
-                        placeholder="e.g. Design homepage"
-                    />
-                </div>
-                <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Description</label>
-                    <textarea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary/50 resize-none text-slate-900 outline-none transition-all"
-                        placeholder="Write some details..."
-                        rows="3"
-                    ></textarea>
-                </div>
-
-                {/* Category */}
-                <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Category</label>
-                    <div className="flex gap-2">
-                        <button
-                            type="button"
-                            onClick={() => setCategory('work')}
-                            className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${category === 'work' ? 'border-blue-500 bg-blue-500/10 text-blue-500' : 'border-slate-200 text-slate-400 hover:border-blue-500/50'}`}
-                        >
-                            <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                            Work
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setCategory('personal')}
-                            className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${category === 'personal' ? 'border-purple-500 bg-purple-500/10 text-purple-500' : 'border-slate-200 text-slate-400 hover:border-purple-500/50'}`}
-                        >
-                            <span className="w-2 h-2 rounded-full bg-purple-500"></span>
-                            Personal
-                        </button>
+        <aside className="add-task-sidebar hidden lg:flex w-80 border-l border-[#3A4A5A] flex-col bg-[#2C3E50] h-full overflow-y-auto custom-scrollbar">
+            <div className="p-6 flex-1">
+                <h2 className="text-lg font-bold mb-6 text-[#E0E0E0]">Create New Task</h2>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    <div>
+                        <label className="block text-xs font-bold text-[#94A3B8] uppercase mb-2">Task Name</label>
+                        <input
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            className="w-full px-4 py-2.5 bg-[#1E2A36] border border-[#3A4A5A] rounded-xl text-sm focus:ring-2 focus:ring-primary/50 text-[#E0E0E0] placeholder-[#94A3B8] outline-none transition-all"
+                            placeholder="e.g. Design homepage"
+                        />
                     </div>
-                </div>
-
-                {/* Priority */}
-                <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Priority</label>
-                    <div className="flex gap-2">
-                        <button
-                            type="button"
-                            onClick={() => setPriority('high')}
-                            className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all ${priority === 'high' ? 'border-red-500 bg-red-500/10 text-red-500' : 'border-slate-200 text-slate-400 hover:border-red-500/50'}`}
-                        >High</button>
-                        <button
-                            type="button"
-                            onClick={() => setPriority('medium')}
-                            className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all ${priority === 'medium' ? 'border-green-500 bg-green-500/10 text-green-500' : 'border-slate-200 text-slate-400 hover:border-green-500/50'}`}
-                        >Med</button>
-                        <button
-                            type="button"
-                            onClick={() => setPriority('low')}
-                            className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all ${priority === 'low' ? 'border-blue-500 bg-blue-500/10 text-blue-500' : 'border-slate-200 text-slate-400 hover:border-blue-500/50'}`}
-                        >Low</button>
+                    <div>
+                        <label className="block text-xs font-bold text-[#94A3B8] uppercase mb-2">Description</label>
+                        <textarea
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            className="w-full px-4 py-2.5 bg-[#1E2A36] border border-[#3A4A5A] rounded-xl text-sm focus:ring-2 focus:ring-primary/50 text-[#E0E0E0] placeholder-[#94A3B8] resize-none outline-none transition-all"
+                            placeholder="Write some details..."
+                            rows="3"
+                        ></textarea>
                     </div>
-                </div>
 
-                {/* Time */}
-                <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Time Setting</label>
-                    <div className="flex gap-2 mb-3">
-                        {timePresets.map(preset => (
+                    {/* Category */}
+                    <div>
+                        <label className="block text-xs font-bold text-[#94A3B8] uppercase mb-2">Category</label>
+                        <div className="flex gap-2">
                             <button
-                                key={preset.label}
                                 type="button"
-                                onClick={() => setDueTime(preset.value)}
-                                className={`flex-1 flex flex-col items-center gap-1 px-2 py-2 text-xs border rounded-xl font-medium transition-all ${dueTime === preset.value ? 'bg-primary/10 text-primary border-primary/30' : 'bg-slate-50 text-slate-500 border-slate-200 hover:border-primary/30'}`}
+                                onClick={() => setCategory('work')}
+                                className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+                                    category === 'work'
+                                        ? 'border-blue-500 bg-blue-500/10 text-blue-500'
+                                        : 'border-[#3A4A5A] text-[#94A3B8] hover:border-blue-500/50'
+                                }`}
                             >
-                                <span className="material-icons text-sm">{preset.icon}</span>
-                                {preset.label}
+                                <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                                Work
                             </button>
-                        ))}
+                            <button
+                                type="button"
+                                onClick={() => setCategory('personal')}
+                                className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+                                    category === 'personal'
+                                        ? 'border-purple-500 bg-purple-500/10 text-purple-500'
+                                        : 'border-[#3A4A5A] text-[#94A3B8] hover:border-purple-500/50'
+                                }`}
+                            >
+                                <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                                Personal
+                            </button>
+                        </div>
                     </div>
-                    <div className="relative mb-3">
-                        <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">calendar_today</span>
-                        <input
-                            type="date"
-                            value={dueDate}
-                            onChange={(e) => setDueDate(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/50 text-slate-900 outline-none transition-all"
-                        />
-                    </div>
-                    <div className="relative">
-                        <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">schedule</span>
-                        <input
-                            type="time"
-                            value={dueTime}
-                            onChange={(e) => setDueTime(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/50 text-slate-900 outline-none transition-all"
-                        />
-                    </div>
-                </div>
-                <div className="pt-2">
-                    <button type="submit" className="w-full py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 hover:scale-[1.02] active:scale-95 transition-all">
-                        Save Task
-                    </button>
-                </div>
-            </form>
 
-            {/* Upcoming Reminders */}
-            <div className="mt-8 border-t border-slate-200 pt-6">
-                <h3 className="text-sm font-bold mb-4 flex items-center justify-between text-slate-900">
-                    Upcoming Reminders
-                    <span className="material-icons text-slate-400 text-sm">more_horiz</span>
-                </h3>
-                <div className="space-y-3">
-                    {state.tasks
-                        .filter(t => !t.completed && t.dueDate)
-                        .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-                        .slice(0, 3)
-                        .map(task => (
-                            <div key={task.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                <div className={`p-2 rounded-xl ${task.priority === 'high' ? 'bg-red-500/10 text-red-500' : task.priority === 'medium' ? 'bg-green-500/10 text-green-500' : 'bg-blue-500/10 text-blue-500'}`}>
-                                    <span className="material-icons text-sm">notifications_active</span>
+                    {/* Priority */}
+                    <div>
+                        <label className="block text-xs font-bold text-[#94A3B8] uppercase mb-2">Priority</label>
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setPriority('high')}
+                                className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all ${
+                                    priority === 'high'
+                                        ? 'border-red-500 bg-red-500/10 text-red-500'
+                                        : 'border-[#3A4A5A] text-[#94A3B8] hover:border-red-500/50'
+                                }`}
+                            >High</button>
+                            <button
+                                type="button"
+                                onClick={() => setPriority('medium')}
+                                className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all ${
+                                    priority === 'medium'
+                                        ? 'border-green-500 bg-green-500/10 text-green-500'
+                                        : 'border-[#3A4A5A] text-[#94A3B8] hover:border-green-500/50'
+                                }`}
+                            >Med</button>
+                            <button
+                                type="button"
+                                onClick={() => setPriority('low')}
+                                className={`flex-1 py-2.5 text-xs font-bold border-2 rounded-xl transition-all ${
+                                    priority === 'low'
+                                        ? 'border-blue-500 bg-blue-500/10 text-blue-500'
+                                        : 'border-[#3A4A5A] text-[#94A3B8] hover:border-blue-500/50'
+                                }`}
+                            >Low</button>
+                        </div>
+                    </div>
+
+                    {/* Time */}
+                    <div>
+                        <label className="block text-xs font-bold text-[#94A3B8] uppercase mb-2">Time Setting</label>
+                        <div className="flex gap-2 mb-3">
+                            {timePresets.map(preset => (
+                                <button
+                                    key={preset.label}
+                                    type="button"
+                                    onClick={() => setDueTime(preset.value)}
+                                    className={`flex-1 flex flex-col items-center gap-1 px-2 py-2 text-xs border rounded-xl font-medium transition-all ${
+                                        dueTime === preset.value
+                                            ? 'bg-primary/10 text-primary border-primary/30'
+                                            : 'bg-[#1E2A36] text-[#94A3B8] border-[#3A4A5A] hover:border-primary/30'
+                                    }`}
+                                >
+                                    <span className="material-icons text-sm">{preset.icon}</span>
+                                    {preset.label}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="relative mb-3">
+                            <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm">calendar_today</span>
+                            <input
+                                type="date"
+                                value={dueDate}
+                                onChange={(e) => setDueDate(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2.5 bg-[#1E2A36] border border-[#3A4A5A] rounded-xl text-sm focus:ring-2 focus:ring-primary/50 text-[#E0E0E0] outline-none transition-all"
+                            />
+                        </div>
+                        <div className="relative">
+                            <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm">schedule</span>
+                            <input
+                                type="time"
+                                value={dueTime}
+                                onChange={(e) => setDueTime(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2.5 bg-[#1E2A36] border border-[#3A4A5A] rounded-xl text-sm focus:ring-2 focus:ring-primary/50 text-[#E0E0E0] outline-none transition-all"
+                            />
+                        </div>
+                    </div>
+                    <div className="pt-2">
+                        <button type="submit" className="w-full py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 hover:scale-[1.02] active:scale-95 transition-all">
+                            Save Task
+                        </button>
+                    </div>
+                </form>
+
+                {/* Upcoming Reminders – now with max height and independent scroll */}
+                <div className="mt-8 border-t border-[#3A4A5A] pt-6">
+                    <h3 className="text-sm font-bold mb-4 flex items-center justify-between text-[#E0E0E0]">
+                        Upcoming Reminders
+                        <span className="material-icons text-[#94A3B8] text-sm">more_horiz</span>
+                    </h3>
+                    <div className="space-y-3 max-h-48 overflow-y-auto custom-scrollbar pr-1">
+                        {state.tasks
+                            .filter(t => !t.completed && t.dueDate)
+                            .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+                            .slice(0, 3)
+                            .map(task => (
+                                <div key={task.id} className="flex items-center gap-3 p-3 bg-[#1E2A36] rounded-xl border border-[#3A4A5A]">
+                                    <div className={`p-2 rounded-xl ${
+                                        task.priority === 'high' ? 'bg-red-500/10 text-red-500' :
+                                        task.priority === 'medium' ? 'bg-green-500/10 text-green-500' :
+                                        'bg-blue-500/10 text-blue-500'
+                                    }`}>
+                                        <span className="material-icons text-sm">notifications_active</span>
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-xs font-bold text-[#E0E0E0] truncate">{task.title}</p>
+                                        <p className="text-[10px] text-[#94A3B8]">{task.dueDate} • {task.dueTime || task.time || 'Anytime'}</p>
+                                    </div>
                                 </div>
-                                <div className="min-w-0 flex-1">
-                                    <p className="text-xs font-bold text-slate-900 truncate">{task.title}</p>
-                                    <p className="text-[10px] text-slate-400">{task.dueDate} • {task.dueTime || task.time || 'Anytime'}</p>
-                                </div>
-                            </div>
-                        ))
-                    }
-                    {state.tasks.filter(t => !t.completed && t.dueDate).length === 0 && (
-                        <p className="text-xs text-slate-400 text-center py-4">No upcoming reminders</p>
-                    )}
+                            ))
+                        }
+                        {state.tasks.filter(t => !t.completed && t.dueDate).length === 0 && (
+                            <p className="text-xs text-[#94A3B8] text-center py-4">No upcoming reminders</p>
+                        )}
+                    </div>
                 </div>
             </div>
         </aside>
