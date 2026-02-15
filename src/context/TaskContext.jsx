@@ -67,7 +67,6 @@ function taskReducer(state, action) {
     case 'SET_SEARCH':
       return { ...state, searchTerm: action.payload };
     case 'LOGOUT':
-      // Clear all data and return to initial state
       return { ...initialState };
     default:
       return state;
@@ -79,26 +78,22 @@ export const TaskProvider = ({ children }) => {
   const { storedValue: storedTasks, setValue: setStoredTasks } = useLocalStorage('tasks', []);
   const { storedValue: storedUserName, setValue: setStoredUserName } = useLocalStorage('userName', '');
 
-  // Load username from localStorage on mount
   useEffect(() => {
     if (storedUserName) {
       dispatch({ type: 'SET_USERNAME', payload: storedUserName });
     }
   }, [storedUserName]);
 
-  // Persist userName changes (including empty string after logout)
   useEffect(() => {
     setStoredUserName(state.userName || '');
   }, [state.userName, setStoredUserName]);
 
-  // Load tasks from localStorage
   useEffect(() => {
     if (storedTasks && storedTasks.length > 0) {
       dispatch({ type: 'SET_TASKS', payload: storedTasks });
     }
   }, [storedTasks]);
 
-  // Storage Monitor & Pruning Logic + persist tasks
   useEffect(() => {
     const dataString = JSON.stringify(state.tasks);
     const sizeInBytes = new Blob([dataString]).size;
@@ -113,8 +108,8 @@ export const TaskProvider = ({ children }) => {
     }
   }, [state.tasks, setStoredTasks]);
 
-  // Notifications for due tasks
-  useNotifications(state.tasks);
+  // Pass both tasks and dispatch to enable toasts and deletion
+  useNotifications(state.tasks, dispatch);
 
   return (
     <TaskContext.Provider value={{ state, dispatch }}>

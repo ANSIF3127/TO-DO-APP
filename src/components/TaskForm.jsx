@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { formatTo12Hour } from '../utils/formatTime'; // adjust path as needed
 
 const TaskForm = ({ initialData = {}, onSubmit, onCancel }) => {
   const [title, setTitle] = useState(initialData.title || '');
@@ -10,6 +11,31 @@ const TaskForm = ({ initialData = {}, onSubmit, onCancel }) => {
   const [priority, setPriority] = useState(initialData.priority || 'medium');
   const [pinned, setPinned] = useState(initialData.pinned || false);
   const [error, setError] = useState('');
+
+  // 12‑hour picker state
+  const [hour12, setHour12] = useState(9);
+  const [minute, setMinute] = useState('00');
+  const [ampm, setAmPm] = useState('AM');
+
+  // Update picker when dueTime changes (e.g., from presets or initialData)
+  useEffect(() => {
+    if (dueTime) {
+      const [hour24, min] = dueTime.split(':');
+      const h24 = parseInt(hour24, 10);
+      setHour12(h24 % 12 || 12);
+      setMinute(min);
+      setAmPm(h24 >= 12 ? 'PM' : 'AM');
+    }
+  }, [dueTime]);
+
+  // Update dueTime when picker changes
+  useEffect(() => {
+    let h24 = hour12;
+    if (ampm === 'PM' && hour12 !== 12) h24 += 12;
+    if (ampm === 'AM' && hour12 === 12) h24 = 0;
+    const paddedHour = h24.toString().padStart(2, '0');
+    setDueTime(`${paddedHour}:${minute}`);
+  }, [hour12, minute, ampm]);
 
   const timePresets = [
     { label: 'Morning', value: '09:00' },
@@ -72,11 +98,8 @@ const TaskForm = ({ initialData = {}, onSubmit, onCancel }) => {
         </div>
         <div className="form-group">
           <label>Due Time</label>
-          <input
-            type="time"
-            value={dueTime}
-            onChange={(e) => setDueTime(e.target.value)}
-          />
+          
+          {/* Presets */}
           <div className="time-presets">
             {timePresets.map(preset => (
               <button
@@ -88,6 +111,56 @@ const TaskForm = ({ initialData = {}, onSubmit, onCancel }) => {
                 {preset.label}
               </button>
             ))}
+          </div>
+
+          {/* Custom 12‑hour picker */}
+          <div className="custom-time-picker" style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <select
+              value={hour12}
+              onChange={(e) => setHour12(parseInt(e.target.value, 10))}
+              className="option-select"
+              style={{ width: '70px' }}
+            >
+              {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (
+                <option key={h} value={h}>{h.toString().padStart(2, '0')}</option>
+              ))}
+            </select>
+
+            <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>:</span>
+
+            <select
+              value={minute}
+              onChange={(e) => setMinute(e.target.value)}
+              className="option-select"
+              style={{ width: '70px' }}
+            >
+              {Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0')).map(m => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
+
+            <div style={{ display: 'flex', gap: '4px' }}>
+              <button
+                type="button"
+                onClick={() => setAmPm('AM')}
+                className={`preset-btn ${ampm === 'AM' ? 'active' : ''}`}
+                style={{ padding: '4px 8px' }}
+              >
+                AM
+              </button>
+              <button
+                type="button"
+                onClick={() => setAmPm('PM')}
+                className={`preset-btn ${ampm === 'PM' ? 'active' : ''}`}
+                style={{ padding: '4px 8px' }}
+              >
+                PM
+              </button>
+            </div>
+
+            <span style={{ fontSize: '0.8rem', color: '#666', marginLeft: 'auto' }}>
+              {formatTo12Hour(dueTime)}
+            </span>
           </div>
         </div>
       </div>
@@ -121,6 +194,29 @@ const TaskForm = ({ initialData = {}, onSubmit, onCancel }) => {
           Abort
         </button>
       </div>
+
+      {/* Add some basic styling for the new picker */}
+      <style jsx>{`
+        .custom-time-picker select {
+          background: rgba(0,0,0,0.2);
+          border: 1px solid rgba(255,255,255,0.1);
+          color: white;
+          padding: 0.5rem;
+          border-radius: 8px;
+          outline: none;
+        }
+        .custom-time-picker button {
+          background: rgba(0,0,0,0.2);
+          border: 1px solid rgba(255,255,255,0.1);
+          color: white;
+          border-radius: 8px;
+          cursor: pointer;
+        }
+        .custom-time-picker button.active {
+          background: var(--primary, #0da6f2);
+          border-color: var(--primary, #0da6f2);
+        }
+      `}</style>
     </form>
   );
 };

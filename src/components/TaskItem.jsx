@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTasks } from '../hooks/useTasks';
+import { formatTo12Hour } from '../utils/formatTime'; // adjust path as needed
 
 const TaskItem = ({ task }) => {
     const { dispatch } = useTasks();
@@ -54,6 +55,10 @@ const TaskItem = ({ task }) => {
 
     const cat = task.category ? categoryColors[task.category] : null;
 
+    // Format time to 12‑hour AM/PM
+    const displayTime = task.time || task.dueTime;
+    const formattedTime = displayTime ? formatTo12Hour(displayTime) : 'Anytime';
+
     if (task.completed) {
         return (
             <div
@@ -104,7 +109,7 @@ const TaskItem = ({ task }) => {
                 <span className="material-icons text-sm">push_pin</span>
             </button>
 
-            <div className="flex flex-col gap-2 pl-8"> {/* pl-8 prevents overlap with pin */}
+            <div className="flex flex-col gap-2 pl-8">
                 {/* Category and Priority Badges */}
                 <div className="flex items-center gap-1.5">
                     {cat && (
@@ -123,17 +128,17 @@ const TaskItem = ({ task }) => {
                     <p className="text-sm text-[#94A3B8] line-clamp-2">{task.description}</p>
                 )}
 
-                {/* Date/Time */}
-                <div className="flex items-center gap-2 text-[11px] text-[#94A3B8] font-medium mt-1">
-                    <div className="flex items-center gap-0.5">
-                        <span className="material-icons text-xs">schedule</span>
-                        <span>{task.time || task.dueTime || 'Anytime'}</span>
-                    </div>
-                    <div className="flex items-center gap-0.5">
-                        <span className="material-icons text-xs">calendar_month</span>
-                        <span>{task.dueDate || 'No date'}</span>
-                    </div>
-                </div>
+{/* Date/Time - 12‑hour format */}
+<div className="flex justify-between items-center text-[11px] text-[#94A3B8] font-medium mt-1">
+    <span className="flex items-center gap-0.5">
+        <span className="material-icons text-xs">schedule</span>
+        {formattedTime}
+    </span>
+    <span className="flex items-center gap-0.5">
+        <span className="material-icons text-xs">calendar_month</span>
+        {task.dueDate || 'No date'}
+    </span>
+</div>
 
                 {/* Action Buttons - icons only */}
                 <div className="flex items-center justify-between mt-2">

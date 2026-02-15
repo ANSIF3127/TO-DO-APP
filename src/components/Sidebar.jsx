@@ -112,7 +112,7 @@ const Sidebar = ({ onClose }) => {
                                 : 'text-[#94A3B8] hover:bg-[#1E2A36]'
                         }`}
                     >
-                        <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
                         Work
                         {workPendingCount > 0 && (
                             <span className="ml-auto text-xs bg-blue-500/20 text-blue-500 px-2 py-0.5 rounded-full font-bold">{workPendingCount}</span>
@@ -127,7 +127,8 @@ const Sidebar = ({ onClose }) => {
                                 : 'text-[#94A3B8] hover:bg-[#1E2A36]'
                         }`}
                     >
-                        <span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                        
+                        <span className="w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse"></span>
                         Personal
                         {personalPendingCount > 0 && (
                             <span className="ml-auto text-xs bg-purple-500/20 text-purple-500 px-2 py-0.5 rounded-full font-bold">{personalPendingCount}</span>

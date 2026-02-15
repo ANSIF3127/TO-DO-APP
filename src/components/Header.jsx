@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useTasks } from '../hooks/useTasks';
+import { formatTo12Hour } from '../utils/formatTime';
 
 const Header = () => {
     const { state, dispatch } = useTasks();
@@ -10,9 +11,18 @@ const Header = () => {
     const [newName, setNewName] = useState('');
     const [renameError, setRenameError] = useState('');
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+    const [currentTime, setCurrentTime] = useState(new Date());
 
     const notifRef = useRef(null);
     const profileRef = useRef(null);
+
+    // Update current time every minute for live calculations
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 60000);
+        return () => clearInterval(timer);
+    }, []);
 
     // Close dropdowns on outside click
     useEffect(() => {
@@ -28,30 +38,97 @@ const Header = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Build notifications – only upcoming tasks (expired ones are filtered out)
     const notifications = useMemo(() => {
-        const now = new Date();
-        const todayStr = now.toISOString().split('T')[0];
+        const now = currentTime;
+        const todayStr = now.toLocaleDateString('en-CA'); // local YYYY-MM-DD
         const tomorrow = new Date(now);
         tomorrow.setDate(tomorrow.getDate() + 1);
-        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+        const tomorrowStr = tomorrow.toLocaleDateString('en-CA');
+
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
         const items = [];
+
         state.tasks.forEach((task) => {
-            if (task.completed || !task.dueDate) return;
-            if (task.dueDate < todayStr) {
-                items.push({ id: task.id, title: task.title, type: 'overdue', label: 'Overdue', icon: 'warning', color: 'text-red-500 bg-red-500/10' });
-            } else if (task.dueDate === todayStr) {
-                items.push({ id: task.id, title: task.title, type: 'today', label: 'Due Today', icon: 'schedule', color: 'text-amber-500 bg-amber-500/10' });
+            if (task.completed) return;
+
+            // Skip expired: past date, or today with time already passed
+            if (task.dueDate && task.dueDate < todayStr) return;
+            if (task.dueDate === todayStr && task.dueTime) {
+                const [hour, minute] = task.dueTime.split(':').map(Number);
+                const dueMinutes = hour * 60 + minute;
+                if (dueMinutes <= currentMinutes) return; // time already passed
+            }
+
+            // Now only upcoming tasks remain
+            if (task.dueDate === todayStr && task.dueTime) {
+                const [hour, minute] = task.dueTime.split(':').map(Number);
+                const dueMinutes = hour * 60 + minute;
+                const diff = dueMinutes - currentMinutes;
+
+                if (diff > 0 && diff <= 1) {
+                    // Within 1 minute before due
+                    items.push({
+                        id: task.id,
+                        title: task.title,
+                        type: 'due-soon',
+                        label: `Due in ${diff} minute${diff === 1 ? '' : 's'}`,
+                        icon: 'schedule',
+                        color: 'text-amber-500 bg-amber-500/10',
+                    });
+                } else {
+                    // Later today
+                    items.push({
+                        id: task.id,
+                        title: task.title,
+                        type: 'today',
+                        label: `Due at ${formatTo12Hour(task.dueTime)}`,
+                        icon: 'event',
+                        color: 'text-blue-500 bg-blue-500/10',
+                    });
+                }
+            } else if (task.dueDate === todayStr && !task.dueTime) {
+                // Due today, no specific time
+                items.push({
+                    id: task.id,
+                    title: task.title,
+                    type: 'today',
+                    label: 'Due Today',
+                    icon: 'event',
+                    color: 'text-blue-500 bg-blue-500/10',
+                });
             } else if (task.dueDate === tomorrowStr) {
-                items.push({ id: task.id, title: task.title, type: 'tomorrow', label: 'Due Tomorrow', icon: 'event', color: 'text-blue-500 bg-blue-500/10' });
+                // Due tomorrow
+                items.push({
+                    id: task.id,
+                    title: task.title,
+                    type: 'tomorrow',
+                    label: 'Due Tomorrow',
+                    icon: 'event',
+                    color: 'text-blue-500 bg-blue-500/10',
+                });
+            } else if (task.dueDate && task.dueDate > tomorrowStr) {
+                // Future date
+                items.push({
+                    id: task.id,
+                    title: task.title,
+                    type: 'upcoming',
+                    label: `Due on ${task.dueDate}`,
+                    icon: 'event',
+                    color: 'text-blue-500 bg-blue-500/10',
+                });
             }
         });
+
+        // Sort: due-soon first, then today, then tomorrow, then upcoming
         items.sort((a, b) => {
-            const order = { overdue: 0, today: 1, tomorrow: 2 };
-            return order[a.type] - order[b.type];
+            const order = { 'due-soon': 0, today: 1, tomorrow: 2, upcoming: 3 };
+            return (order[a.type] || 4) - (order[b.type] || 4);
         });
+
         return items;
-    }, [state.tasks]);
+    }, [state.tasks, currentTime]);
 
     const initials = state.userName
         ? state.userName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
@@ -71,7 +148,6 @@ const Header = () => {
             setRenameError('Name cannot be empty');
             return;
         }
-        // Validation: no numbers allowed
         if (/\d/.test(trimmed)) {
             setRenameError('Name should not contain numbers');
             return;
@@ -89,7 +165,7 @@ const Header = () => {
     return (
         <>
             <header className="h-14 md:h-16 border-b border-[#3A4A5A] bg-[#2C3E50]/80 backdrop-blur-md flex items-center justify-between px-4 md:px-8 z-10">
-                {/* Search */}
+                {/* Search section */}
                 <div className={`flex items-center flex-1 max-w-md ${mobileSearchOpen ? '' : 'hidden md:flex'}`}>
                     <div className="relative w-full">
                         <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]">search</span>
@@ -125,7 +201,7 @@ const Header = () => {
                             )}
                         </button>
 
-                        {/* Notification Dropdown */}
+                        {/* Notification Dropdown – only upcoming items */}
                         {showNotifications && (
                             <div className="absolute right-0 top-12 w-72 md:w-80 bg-[#2C3E50] border border-[#3A4A5A] rounded-2xl shadow-xl overflow-hidden z-50"
                                 style={{ animation: 'notifSlideDown 0.25s ease-out forwards' }}>
@@ -141,7 +217,7 @@ const Header = () => {
                                         </div>
                                     ) : (
                                         notifications.map((n) => (
-                                            <div key={n.id} className="flex items-center gap-3 px-4 py-3 hover:bg-[#1E2A36] transition-colors border-b border-[#3A4A5A] last:border-b-0">
+                                            <div key={n.id + n.type} className="flex items-center gap-3 px-4 py-3 hover:bg-[#1E2A36] transition-colors border-b border-[#3A4A5A] last:border-b-0">
                                                 <div className={`p-2 rounded-xl ${n.color}`}>
                                                     <span className="material-icons text-sm">{n.icon}</span>
                                                 </div>
@@ -169,6 +245,7 @@ const Header = () => {
                             <div className="text-right hidden sm:block">
                                 <p className="text-xs font-bold text-[#E0E0E0]">{state.userName}</p>
                             </div>
+                            <span className="w-1 h-1 rounded-full bg-green-500 animate-pulse delay-200"></span>
                             <span className="material-icons text-[#94A3B8] text-sm">arrow_drop_down</span>
                         </button>
 

@@ -1,3 +1,4 @@
+
 export const formatTo12Hour = (time24) => {
   if (!time24) return '';
   const [hourStr, minute] = time24.split(':');
