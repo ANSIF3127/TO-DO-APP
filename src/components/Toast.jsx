@@ -24,12 +24,12 @@ const Toast = ({ t, onRemove }) => {
     const iconName = icons[t.type] || icons.info;
 
     return (
-        <div className={`flex items-center gap-3 p-4 bg-white dark:bg-card-dark border-l-4 rounded-lg shadow-lg animate-in slide-in-from-right duration-300 ${colorClass}`}>
+        <div className={`flex items-center gap-3 p-3 md:p-4 bg-white border-l-4 rounded-lg shadow-lg animate-in slide-in-from-right duration-300 ${colorClass}`}>
             <span className="material-icons text-xl">{iconName}</span>
-            <span className="text-sm font-bold text-slate-800 dark:text-slate-100">{t.message}</span>
+            <span className="text-sm font-bold text-slate-800">{t.message}</span>
             <button
                 onClick={() => onRemove(t.id)}
-                className="ml-auto text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                className="ml-auto text-slate-400 hover:text-slate-600"
             >
                 <span className="material-icons text-sm">close</span>
             </button>
@@ -38,4 +38,3 @@ const Toast = ({ t, onRemove }) => {
 };
 
 export default Toast;
-

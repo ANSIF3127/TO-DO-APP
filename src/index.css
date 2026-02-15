@@ -21,6 +21,7 @@
     }
 }
 
+/* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
 }
@@ -30,13 +31,44 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #94a3b8;
     border-radius: 10px;
 }
 
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #334155;
+}
+
+/* Line clamp utility */
 .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+/* ===== Welcome Screen Animations ===== */
+@keyframes welcomeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ===== Notification Dropdown Animation ===== */
+@keyframes notifSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

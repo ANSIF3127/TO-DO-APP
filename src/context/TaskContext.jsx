@@ -3,21 +3,25 @@ import { TaskContext } from './TaskContextObject';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useNotifications } from '../hooks/useNotifications';
 
-
-
 const initialState = {
   tasks: [],
-  filter: 'all',        // 'all', 'active', 'completed'
-  sortBy: 'date',       // 'date', 'priority'
-  sortOrder: 'asc',     // 'asc', 'desc'
-  toasts: [],           // [{ id, message, type }]
+  filter: 'all',            // 'all', 'active', 'completed', 'today'
+  categoryFilter: null,      // null | 'work' | 'personal'
+  sortBy: 'date',            // 'date', 'priority'
+  sortOrder: 'asc',          // 'asc', 'desc'
+  toasts: [],                // [{ id, message, type }]
   searchTerm: '',
+  userName: '',
 };
 
 const MAX_STORAGE_BYTES = 4 * 1024 * 1024; // 4MB Limit
 
 function taskReducer(state, action) {
   switch (action.type) {
+    case 'SET_USERNAME':
+      return { ...state, userName: action.payload };
+    case 'SET_CATEGORY_FILTER':
+      return { ...state, categoryFilter: action.payload, filter: 'all' };
     case 'ADD_TOAST':
       return { ...state, toasts: [...state.toasts, { id: Date.now(), ...action.payload }] };
     case 'REMOVE_TOAST':
@@ -57,7 +61,7 @@ function taskReducer(state, action) {
         ),
       };
     case 'SET_FILTER':
-      return { ...state, filter: action.payload };
+      return { ...state, filter: action.payload, categoryFilter: null };
     case 'SET_SORT':
       return { ...state, sortBy: action.payload.sortBy, sortOrder: action.payload.sortOrder };
     case 'SET_SEARCH':
@@ -70,8 +74,23 @@ function taskReducer(state, action) {
 export const TaskProvider = ({ children }) => {
   const [state, dispatch] = useReducer(taskReducer, initialState);
   const { storedValue: storedTasks, setValue: setStoredTasks } = useLocalStorage('tasks', []);
+  const { storedValue: storedUserName, setValue: setStoredUserName } = useLocalStorage('userName', '');
 
-  // Sync localStorage with state.tasks
+  // Load username from localStorage on mount
+  useEffect(() => {
+    if (storedUserName) {
+      dispatch({ type: 'SET_USERNAME', payload: storedUserName });
+    }
+  }, [storedUserName]);
+
+  // Persist userName changes
+  useEffect(() => {
+    if (state.userName) {
+      setStoredUserName(state.userName);
+    }
+  }, [state.userName, setStoredUserName]);
+
+  // Load tasks from localStorage
   useEffect(() => {
     if (storedTasks && storedTasks.length > 0) {
       dispatch({ type: 'SET_TASKS', payload: storedTasks });
@@ -83,12 +102,10 @@ export const TaskProvider = ({ children }) => {
     const dataString = JSON.stringify(state.tasks);
     const sizeInBytes = new Blob([dataString]).size;
 
-    // Auto-pruning if nearing 4MB limit
     if (sizeInBytes >= MAX_STORAGE_BYTES) {
       console.warn('Storage limit approaching. Pruning oldest tasks...');
-      // Keep pinned tasks and 50 most recent tasks
       const sortedByAge = [...state.tasks].sort((a, b) => a.id - b.id);
-      const toKeep = sortedByAge.slice(Math.floor(sortedByAge.length * 0.2)); // Remove oldest 20%
+      const toKeep = sortedByAge.slice(Math.floor(sortedByAge.length * 0.2));
       dispatch({ type: 'SET_TASKS', payload: toKeep });
     }
 
@@ -104,4 +121,3 @@ export const TaskProvider = ({ children }) => {
     </TaskContext.Provider>
   );
 };
-
